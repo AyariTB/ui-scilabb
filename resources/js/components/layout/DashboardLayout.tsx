@@ -35,7 +35,7 @@ interface SidebarItemProps {
 }
 
 /**
- * Mengapa komponen terpisah: Agar tooltip hover hanya re-render item individual,
+ * tooltip hover hanya re-render item individual,
  * bukan seluruh sidebar, saat user mengarahkan kursor.
  */
 function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemProps) {
@@ -215,7 +215,7 @@ export default function DashboardLayout({
                                     {platformTitle}
                                 </h1>
                                 <p className="text-[10px] text-slate-muted">
-                                    Unhas
+                                    Admin
                                 </p>
                             </div>
                         </div>

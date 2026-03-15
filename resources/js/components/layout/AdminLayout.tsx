@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return (
         <DashboardLayout
             menuSections={MENU_CONFIG.admin}
-            platformTitle="Platform Riset"
+            platformTitle="UKK UNHAS"
         >
             {children}
         </DashboardLayout>
