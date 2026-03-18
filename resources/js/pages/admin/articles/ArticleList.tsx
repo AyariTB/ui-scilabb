@@ -89,7 +89,6 @@ export default function ArticleList() {
                         className="w-12 h-10 object-cover rounded-md border border-slate-200 shrink-0"
                     />
                 ) : (
-                    /* bg-slate-100 & text-slate-400 untuk placeholder gambar netral */
                     <div className="w-12 h-10 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
                         <ImageIcon className="w-4 h-4" />
                     </div>
@@ -99,7 +98,6 @@ export default function ArticleList() {
             header: 'Judul Artikel',
             render: (article) => (
                 <div className="flex flex-col">
-                    {/* text-navy untuk judul agar konsisten dengan variable warna project */}
                     <span className="font-semibold text-navy max-w-sm truncate" title={article.title}>
                         {article.title}
                     </span>
@@ -123,12 +121,10 @@ export default function ArticleList() {
             header: 'Status',
             render: (article) =>
                 article.status === 'published' ? (
-                    /* bg-emerald-50 & text-emerald-700 untuk status aktif/published */
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                         Dipublikasikan
                     </span>
                 ) : (
-                    /* bg-amber-50 & text-amber-700 untuk status draft/pending */
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
                         Draft
                     </span>
@@ -151,7 +147,6 @@ export default function ArticleList() {
                     >
                         <Edit2 className="w-4 h-4" />
                     </button>
-                    {/* hover:text-danger & hover:bg-red-50 untuk aksi destruktif */}
                     <button
                         onClick={() => handleDelete(article.id)}
                         className="p-1.5 text-slate-400 hover:text-danger hover:bg-red-50 rounded-md transition-colors"
