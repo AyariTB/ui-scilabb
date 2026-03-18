@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { MenuSection, MenuItem } from "@/constants/menuConfig";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // --- Konstanta Layout ---
 const SIDEBAR_WIDTH_EXPANDED = 256;
@@ -22,10 +23,13 @@ const TRANSITION_DURATION = 0.25;
 const MOCK_USER = {
     name: "Dr. Andi Pratama",
     email: "andi.pratama@unhas.ac.id",
-    role: "admin",
+    role: "kapal",
 } as const;
 
 // --- Sub-komponen: SidebarItem ---
+
+import { createPortal } from "react-dom";
+import { useRef, useEffect } from "react";
 
 interface SidebarItemProps {
     item: MenuItem;
@@ -40,10 +44,22 @@ interface SidebarItemProps {
  */
 function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemProps) {
     const [isHovered, setIsHovered] = useState(false);
+    const itemRef = useRef<HTMLDivElement>(null);
     const Icon = item.icon;
+
+    // Menghitung posisi Y secara real-time saat hover
+    const [tooltipTop, setTooltipTop] = useState(0);
+
+    useEffect(() => {
+        if (isHovered && itemRef.current) {
+            const rect = itemRef.current.getBoundingClientRect();
+            setTooltipTop(rect.top + rect.height / 2);
+        }
+    }, [isHovered, isCollapsed]);
 
     return (
         <div
+            ref={itemRef}
             className="relative"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -77,26 +93,31 @@ function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemPro
                 )}
             </button>
 
-            {/* Floating tooltip saat sidebar collapsed */}
-            <AnimatePresence>
-                {isCollapsed && isHovered && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -6 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -6 }}
-                        transition={{ duration: 0.15 }}
-                        className="
-                            absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2
-                            whitespace-nowrap rounded-lg bg-navy px-3 py-1.5
-                            text-xs font-medium text-white shadow-lg
-                        "
-                    >
-                        {item.label}
-                        {/* Arrow pointer */}
-                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-navy" />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Floating tooltip saat sidebar collapsed (Portal supaya tidak terclip) */}
+            {typeof document !== "undefined" && createPortal(
+                <AnimatePresence>
+                    {isCollapsed && isHovered && (
+                        <motion.div
+                            initial={{ opacity: 0, x: -4 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -4 }}
+                            transition={{ duration: 0.15 }}
+                            style={{
+                                top: tooltipTop,
+                                left: SIDEBAR_WIDTH_COLLAPSED + 8, // Sedikit geser ke kanan dari sidebar
+                                transform: "translateY(-50%)",
+                            }}
+                            className="
+                                fixed z-[9999] whitespace-nowrap rounded bg-navy px-2.5 py-1.5
+                                text-xs font-medium text-white shadow-sm
+                            "
+                        >
+                            {item.label}
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 }
@@ -156,20 +177,21 @@ export default function DashboardLayout({
     children,
     menuSections,
     platformTitle = "Platform Riset",
-    currentPath = "/admin/dashboard",
 }: DashboardLayoutProps) {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [activePath, setActivePath] = useState(currentPath);
+    
+    // Gunakan actual URL string dari react-router-dom
+    const activePath = location.pathname;
 
     const toggleSidebar = useCallback(() => {
         setIsCollapsed((prev) => !prev);
     }, []);
 
     const handleNavigate = useCallback((href: string) => {
-        // Saat frontend-only: hanya update active state visual
-        // Saat integrasi backend: ganti dengan router.visit(href)
-        setActivePath(href);
-    }, []);
+        navigate(href);
+    }, [navigate]);
 
     const currentWidth = isCollapsed
         ? SIDEBAR_WIDTH_COLLAPSED
@@ -215,7 +237,7 @@ export default function DashboardLayout({
                                     {platformTitle}
                                 </h1>
                                 <p className="text-[10px] text-slate-muted">
-                                    Admin
+                                    UKK UNHAS
                                 </p>
                             </div>
                         </div>
@@ -299,9 +321,6 @@ export default function DashboardLayout({
                                 placeholder:text-label-muted focus:outline-none
                             "
                         />
-                        <kbd className="hidden rounded border border-slate-border px-1.5 py-0.5 text-[10px] text-slate-muted sm:inline-block">
-                            ⌘K
-                        </kbd>
                     </div>
 
                     {/* Actions */}

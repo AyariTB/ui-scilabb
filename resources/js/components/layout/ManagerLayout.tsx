@@ -10,7 +10,7 @@ export default function ManagerLayout({ children }: ManagerLayoutProps) {
     return (
         <DashboardLayout
             menuSections={MENU_CONFIG.manager}
-            platformTitle="Ship Manager"
+            platformTitle="Manager Kapal"
         >
             {children}
         </DashboardLayout>

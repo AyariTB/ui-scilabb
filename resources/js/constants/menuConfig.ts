@@ -158,6 +158,18 @@ const MANAGER_MENU: MenuSection[] = [
                 href: "/manager/dashboard",
             },
             {
+                key: "orders",
+                label: "Pesanan",
+                icon: ClipboardList,
+                href: "/manager/orders",
+            },
+            {
+                key: "payments",
+                label: "Pembayaran",
+                icon: CreditCard,
+                href: "/manager/payments",
+            },
+            {
                 key: "calendar",
                 label: "Kalender",
                 icon: CalendarDays,
@@ -166,31 +178,60 @@ const MANAGER_MENU: MenuSection[] = [
         ],
     },
     {
-        title: "Kapal",
+        title: "Explorer 1",
         items: [
             {
-                key: "vessels",
-                label: "Daftar Kapal",
+                key: "exp1-general",
+                label: "Umum",
                 icon: Ship,
-                href: "/manager/vessel",
+                href: "/manager/explorer-1/general",
             },
             {
-                key: "bookings",
-                label: "Booking",
-                icon: ClipboardList,
-                href: "/manager/bookings",
+                key: "exp1-tools",
+                label: "Alat Kapal",
+                icon: Wrench,
+                href: "/manager/explorer-1/tools",
+            },
+            {
+                key: "exp1-facilities",
+                label: "Fasilitas",
+                icon: Package,
+                href: "/manager/explorer-1/facilities",
+            },
+            {
+                key: "exp1-guides",
+                label: "Panduan/SOP",
+                icon: FileText,
+                href: "/manager/explorer-1/guides",
             },
         ],
     },
     {
-        title: "Keuangan",
+        title: "Explorer 2",
         items: [
             {
-                key: "payments",
-                label: "Pembayaran",
-                icon: CreditCard,
-                href: "/manager/payments",
+                key: "exp2-general",
+                label: "Umum",
+                icon: Ship,
+                href: "/manager/explorer-2/general",
             },
+            {
+                key: "exp2-tools",
+                label: "Alat Kapal",
+                icon: Wrench,
+                href: "/manager/explorer-2/tools",
+            },
+            {
+                key: "exp2-facilities",
+                label: "Fasilitas",
+                icon: Package,
+                href: "/manager/explorer-2/facilities",
+            },
+        ],
+    },
+    {
+        title: "Laporan",
+        items: [
             {
                 key: "reports",
                 label: "Laporan",
