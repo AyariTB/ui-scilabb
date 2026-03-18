@@ -23,7 +23,7 @@ Platform manajemen layanan riset terintegrasi untuk Universitas Hasanuddin, menc
 | **Styling** | TailwindCSS v4, shadcn/ui |
 | **Backend** | Laravel 12 (PHP 8.3+) |
 | **State Management** | Zustand (Client), TanStack Query (Server) |
-| **Database** | PostgreSQL 16 |
+| **Database** | PostgreSQL 17 |
 | **Realtime/SSR** | Inertia.js v2 |
 
 ---

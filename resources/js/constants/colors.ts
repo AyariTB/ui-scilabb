@@ -21,7 +21,7 @@ export const COLORS = {
         border: "#E2E8F0",     // Tailwind: border-slate-border
         text: {
             active: "#1B263B",  // Tailwind: text-navy
-            inactive: "#94A3B8", // Tailwind: text-slate-muted
+            inactive: "#818A96", // Tailwind: text-slate-muted
         },
     },
     status: {
@@ -33,5 +33,11 @@ export const COLORS = {
     background: {
         main: "#F8FAFC",        // Tailwind: bg-soft-white
         card: "#FFFFFF",
+    },
+    chart: {
+        primary: "#1B263B",     // Navy (warna balok BarChart dan titik LineChart)
+        grid: "#E2E8F0",        // Slate 200 (garis panduan chart)
+        text: "#64748B",        // Slate 500 (teks label sumbu)
+        tooltipBg: "#F8FAFC",   // Latar tooltip chart
     },
 } as const;

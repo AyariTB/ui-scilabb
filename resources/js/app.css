@@ -89,16 +89,16 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   /* ── Dashboard Semantic Colors ──
-     Mengapa: Warna yang dipakai berulang di sidebar, cards, dan top-bar
+     Warna yang dipakai berulang di sidebar, cards, dan top-bar
      didefinisikan sekali di sini agar mudah diganti secara global. */
   --color-navy: #1B263B;
   --color-navy-light: #2d3a50;
-  --color-slate-muted: #94A3B8;
+  --color-slate-muted: #818A96;
   --color-slate-border: #E2E8F0;
   --color-soft-white: #F8FAFC;
   --color-hover-bg: #F1F5F9;
   --color-active-bg: #F0F4FF;
-  --color-label-muted: #CBD5E1;
+  --color-label-muted: #b9c7d7;
   --color-danger: #EF4444;
   --color-text-secondary: #64748B;
 }
