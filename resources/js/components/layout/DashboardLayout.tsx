@@ -180,13 +180,23 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Mengambil state awal dari localStorage agar tetap konsisten saat refresh/navigasi
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("sidebar_collapsed") === "true";
+        }
+        return false;
+    });
     
-    // Gunakan actual URL string dari react-router-dom
     const activePath = location.pathname;
 
     const toggleSidebar = useCallback(() => {
-        setIsCollapsed((prev) => !prev);
+        setIsCollapsed((prev) => {
+            const newState = !prev;
+            localStorage.setItem("sidebar_collapsed", String(newState));
+            return newState;
+        });
     }, []);
 
     const handleNavigate = useCallback((href: string) => {
@@ -211,6 +221,7 @@ export default function DashboardLayout({
         <div className="flex h-screen overflow-hidden bg-soft-white">
             {/* --- Sidebar --- */}
             <motion.aside
+                initial={ false }
                 animate={{ width: currentWidth }}
                 transition={{ duration: TRANSITION_DURATION, ease: "easeInOut" }}
                 className="
@@ -227,16 +238,14 @@ export default function DashboardLayout({
                     {!isCollapsed && (
                         <div className="flex items-center gap-2.5">
                             {/* Logo mark */}
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy">
-                                <span className="text-xs font-bold text-white">
-                                    PR
-                                </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+                                <img src="https://ukk.unhas.ac.id/assets/img/logo.png" alt="" />
                             </div>
                             <div className="leading-none">
                                 <h1 className="text-sm font-bold tracking-tight text-navy">
                                     {platformTitle}
                                 </h1>
-                                <p className="text-[10px] text-slate-muted">
+                                <p className="mt-1 text-[12px] text-navy">
                                     UKK UNHAS
                                 </p>
                             </div>

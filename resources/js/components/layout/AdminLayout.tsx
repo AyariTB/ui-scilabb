@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return (
         <DashboardLayout
             menuSections={MENU_CONFIG.admin}
-            platformTitle="UKK UNHAS"
+            platformTitle="Admin"
         >
             {children}
         </DashboardLayout>
