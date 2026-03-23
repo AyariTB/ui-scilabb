@@ -80,19 +80,22 @@ export default function ArticleList() {
         },
         {
             header: 'Foto',
-            className: 'w-16',
-            render: (article) =>
-                article.thumbnailUrl ? (
-                    <img
-                        src={article.thumbnailUrl}
-                        alt={article.title}
-                        className="w-12 h-10 object-cover rounded-md border border-slate-200 shrink-0"
-                    />
-                ) : (
-                    <div className="w-12 h-10 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0">
-                        <ImageIcon className="w-4 h-4" />
-                    </div>
-                ),
+            className: 'w-20 min-w-[80px]', 
+            render: (article) => (
+                <div className="w-12 h-10 flex-shrink-0"> 
+                    {article.thumbnailUrl ? (
+                        <img
+                            src={article.thumbnailUrl}
+                            alt={article.title}
+                            className="w-full h-full object-cover rounded-md border border-slate-200"
+                        />
+                    ) : (
+                        <div className="w-full h-full rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                            <ImageIcon className="w-4 h-4" />
+                        </div>
+                    )}
+                </div>
+            ),
         },
         {
             header: 'Judul Artikel',
