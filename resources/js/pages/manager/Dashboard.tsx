@@ -42,7 +42,7 @@ const MOCK_STATS = [
     },
     {
         key: "unpaid",
-        label: "Belum Bayar",
+        label: "Belum Lunas",
         value: "3 Pesanan",
         trend: "down" as const,
         icon: CreditCard,
