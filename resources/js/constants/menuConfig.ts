@@ -5,7 +5,6 @@ import {
     FileText,
     ShoppingCart,
     Wrench,
-    CreditCard,
     Ship,
     CalendarDays,
     ClipboardList,
@@ -50,6 +49,12 @@ const ADMIN_MENU: MenuSection[] = [
                 icon: Users,
                 href: "/admin/users",
             },
+            {
+                key: "orders",
+                label: "Pesanan",
+                icon: ShoppingCart,
+                href: "/admin/orders",
+            },
         ],
     },
     {
@@ -72,23 +77,6 @@ const ADMIN_MENU: MenuSection[] = [
                 label: "Alat & Instrumen",
                 icon: Package,
                 href: "/admin/tools",
-            },
-        ],
-    },
-    {
-        title: "Transaksi",
-        items: [
-            {
-                key: "orders",
-                label: "Pesanan",
-                icon: ShoppingCart,
-                href: "/admin/orders",
-            },
-            {
-                key: "transactions",
-                label: "Transaksi",
-                icon: CreditCard,
-                href: "/admin/transactions",
             },
         ],
     },
@@ -162,12 +150,6 @@ const MANAGER_MENU: MenuSection[] = [
                 label: "Pesanan",
                 icon: ClipboardList,
                 href: "/manager/orders",
-            },
-            {
-                key: "payments",
-                label: "Pembayaran",
-                icon: CreditCard,
-                href: "/manager/payments",
             },
             {
                 key: "calendar",
