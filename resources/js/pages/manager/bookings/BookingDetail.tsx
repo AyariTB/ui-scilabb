@@ -1,5 +1,5 @@
 /**
- * MANAGER BOOKING DETAIL — Halaman detail pesanan bagi manager.
+ * MANAGER BOOKING DETAIL - Halaman detail pesanan bagi manager.
  * 
  * Menggunakan BookingDetailView untuk assembly UI.
  * Menghubungkan ke React Query hooks untuk sinkronisasi data.
@@ -24,10 +24,10 @@ import {
 export default function BookingDetail() {
     const { id } = useParams<{ id: string }>();
 
-    // ── Data Fetching ──
+    // --- Data Fetching ---
     const { data: booking, isLoading, isError } = useBookingDetail(id);
 
-    // ── Mutation Hooks ──
+    // --- Mutation Hooks ---
     const approveMutation = useApproveBooking(id!);
     const rejectOrderMutation = useRejectBooking(id!);
     const confirmPaymentMutation = useConfirmPayment(id!);
@@ -69,15 +69,12 @@ export default function BookingDetail() {
                 onSaveNote={async (c, nid) => { 
                     if (nid) {
                         await updateNoteMutation.mutateAsync({ content: c }, { onSuccess: () => {}, onSettled: () => {}, onError: () => {} });
-                        // Note: actual hook call would need to handle noteId correctly 
-                        // Simplified for current hook structure
                     } else {
                         await addNoteMutation.mutateAsync({ content: c });
                     }
                 }}
                 onDeleteNote={async (nid) => {
                     await deleteNoteMutation.mutateAsync(undefined, { onSuccess: () => {}, onSettled: () => {}, onError: () => {} });
-                    // Simplified for current hook structure
                 }}
             />
         </ManagerLayout>

@@ -1,7 +1,5 @@
 /**
- * BOOKING TABLE — Komponen tabel reusable untuk menampilkan daftar pesanan.
- * 
- * Mendukung:
+ * BOOKING TABLE 
  * - Kolom standar (kode, peminjam, kegiatan, tanggal, harga, status, aksi)
  * - Extra columns opsional (untuk admin: tipe internal/eksternal, nama layanan)
  * - Sorting per kolom
@@ -78,7 +76,7 @@ export function BookingTable({
     return (
         <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full min-w-[1000px] text-sm">
-                {/* ── TABLE HEAD ── */}
+                {/* ---TABLE HEAD ---*/}
                 <thead className="border-b border-slate-border bg-slate-50/50">
                     <tr>
                         <th className="px-5 py-3.5 text-left text-[12px] font-semibold text-slate-500">No</th>
@@ -130,7 +128,7 @@ export function BookingTable({
                     </tr>
                 </thead>
 
-                {/* ── TABLE BODY ── */}
+                {/* ---TABLE BODY ---*/}
                 <tbody className="divide-y divide-slate-border">
                     {bookings.map((booking, index) => {
                         const conflict = hasApprovedConflict(booking);

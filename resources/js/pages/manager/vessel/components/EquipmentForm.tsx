@@ -104,9 +104,6 @@ export default function EquipmentForm({ initialData, onSubmit, onCancel, loading
                 >
                 {formData.thumbnailUrl ? (
                     <div className="relative w-full h-52 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-                    {/* h-48: Mengunci tinggi gambar (192px). 
-                        object-cover: Memastikan gambar memenuhi area tanpa distorsi (terpotong rapi). 
-                    */}
                     <img 
                         src={formData.thumbnailUrl} 
                         alt="Preview" 

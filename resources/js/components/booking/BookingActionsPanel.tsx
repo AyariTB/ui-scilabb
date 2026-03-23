@@ -1,10 +1,3 @@
-/**
- * BOOKING ACTIONS PANEL — Panel aksi utama (sidebar) untuk memproses pesanan.
- * 
- * Komponen shared yang menampilkan tombol-tombol aksi berdasarkan status pesanan.
- * Bisa digunakan oleh role manager maupun admin.
- */
-
 import { CheckCircle2, XCircle, AlertTriangle, Clock, Loader2, Info } from 'lucide-react';
 import type { Booking } from '@/types/booking.types';
 import { formatIDR, formatShortDate, formatDateTime, getPaymentCountdown, getTotalPaid, hasApprovedConflict } from './utils';
@@ -53,9 +46,9 @@ export function BookingActionsPanel({
 
     return (
         <div className="space-y-4 sticky top-10">
-            {/* 1. SECTION AKSI UTAMA BERDASARKAN STATUS */}
+            {/* SECTION AKSI UTAMA BERDASARKAN STATUS */}
 
-            {/* A. Verifikasi Pesanan Baru */}
+            {/* Verifikasi Pesanan Baru */}
             {isWaitingVerification && (
                 <div className="rounded-xl border border-slate-border bg-white p-5 space-y-4 animate-in slide-in-from-right-5 duration-500">
                     <div className="space-y-1">
@@ -95,7 +88,7 @@ export function BookingActionsPanel({
                 </div>
             )}
 
-            {/* B. Verifikasi Bukti Pembayaran */}
+            {/* Verifikasi Bukti Pembayaran */}
             {isWaitingPaymentVerification && (
                 <div className="rounded-xl border border-slate-border bg-white p-5 space-y-4 animate-in slide-in-from-right-5 duration-500">
                     <div className="space-y-1">
@@ -135,7 +128,7 @@ export function BookingActionsPanel({
                 </div>
             )}
 
-            {/* C. Countdown Deadline (Post Verification) */}
+            {/* Countdown Deadline (Post Verification) */}
             {isApprovedNoPayment && paymentCountdown && (
                 <div className={`rounded-xl border p-5 space-y-4 animate-in fade-in duration-500 ${paymentCountdown.isUrgent ? 'border-red-200 bg-red-50/50' : 'border-amber-200 bg-amber-50/50'}`}>
                     <div className="flex items-center justify-between">
@@ -165,7 +158,7 @@ export function BookingActionsPanel({
                 </div>
             )}
 
-            {/* D. Status Lunas Success State */}
+            {/* Status Lunas Success State */}
             {booking.payment_status === 'LUNAS' && (
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-6 text-center space-y-3 animate-in zoom-in-95 duration-500">
                     <div className="mx-auto w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-1">
@@ -183,7 +176,7 @@ export function BookingActionsPanel({
                 </div>
             )}
 
-            {/* 2. RE-VERIFICATION & QUICK ACTIONS (Conditional) */}
+            {/* RE-VERIFICATION & QUICK ACTIONS (Conditional) */}
             {canReverify && (
                 <div className="rounded-xl border border-slate-border bg-white p-5 space-y-3">
                     <h3 className="text-sm font-semibold text-slate-600 flex items-center gap-2">

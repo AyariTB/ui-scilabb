@@ -51,7 +51,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
                 flex flex-col max-h-[90vh] overflow-hidden
                 animate-in zoom-in-95 duration-200 ease-out
             `}>
-                {/* Header — hanya tampil jika ada title */}
+                {/* Header - hanya tampil jika ada title */}
                 {hasHeader && (
                     <div className="px-5 py-4 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
                         <h2 className="text-base font-semibold text-slate-800">{title}</h2>

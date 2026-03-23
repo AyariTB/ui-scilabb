@@ -29,12 +29,7 @@ interface DataTableProps<T> {
 }
 
 /**
- * Komponen tabel reusable yang dapat digunakan di seluruh halaman.
- *
- * Mengapa menggunakan generic <T>:
- * Supaya TypeScript bisa menjamin type-safety antara definisi kolom dan data
- * yang dirender, tanpa perlu casting `any`.
- *
+ * Komponen tabel
  * @example
  * <DataTable
  *   columns={[

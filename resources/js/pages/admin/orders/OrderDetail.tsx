@@ -17,10 +17,10 @@ import {
 export default function OrderDetail() {
     const { id } = useParams<{ id: string }>();
 
-    // ── Data Fetching ──
+    // --- Data Fetching ---
     const { data: booking, isLoading, isError } = useBookingDetail(id);
 
-    // ── Mutation Hooks ──
+    // --- Mutation Hooks ---
     const approveMutation = useApproveBooking(id!);
     const rejectOrderMutation = useRejectBooking(id!);
     const confirmPaymentMutation = useConfirmPayment(id!);

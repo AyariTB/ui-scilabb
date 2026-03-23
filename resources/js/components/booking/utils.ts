@@ -1,8 +1,5 @@
 /**
- * BOOKING UTILS — Helper functions untuk formatting dan kalkulasi data booking.
- * 
- * File ini dipindahkan dari pages/manager/bookings/ ke components/booking/
- * agar bisa dipakai bersama oleh role manager, admin, dan role lainnya.
+ * BOOKING UTILS - Helper functions untuk formatting dan kalkulasi data booking.
  */
 
 import type { Booking, BookingStatusFilter } from '@/types/booking.types';

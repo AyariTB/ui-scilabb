@@ -65,11 +65,7 @@ export default function ArticleList() {
         }
     };
 
-    /**
-     * Definisi kolom untuk tabel artikel.
-     * Diletakkan di dalam komponen agar dapat mengakses `navigate` dan `handleDelete`
-     * tanpa prop-drilling ke DataTable.
-     */
+    // Definisi kolom untuk tabel artikel.
     const articleColumns: TableColumn<Article>[] = [
         {
             header: 'No',

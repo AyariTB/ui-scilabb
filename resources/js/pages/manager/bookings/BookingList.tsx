@@ -1,5 +1,5 @@
 /**
- * MANAGER BOOKING LIST — Halaman utama bagi manager untuk melihat daftar pesanan kapal.
+ * MANAGER BOOKING LIST - Halaman utama bagi manager untuk melihat daftar pesanan kapal.
  * 
  * Menggunakan komponen reusable BookingListView untuk konsistensi.
  */
@@ -9,7 +9,7 @@ import { BookingListView } from '@/components/booking';
 import { useBookings } from '@/hooks/useBooking';
 
 export default function BookingList() {
-    // ── Data Fetching (React Query) ──
+    // --- Data Fetching (React Query) ---
     const { data: bookings = [], isLoading } = useBookings();
 
     return (

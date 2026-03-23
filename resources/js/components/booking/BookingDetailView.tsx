@@ -27,7 +27,7 @@ import { getTotalPaid } from './utils';
 
 import type { Booking } from '@/types/booking.types';
 
-// ── TOAST ─────────────────────────────────────────────────────
+// ---TOAST ---
 type ToastType = 'success' | 'error' | 'info';
 interface ToastItem { id: string; type: ToastType; message: string }
 
@@ -56,7 +56,7 @@ function useToast() {
     return { toasts, push, dismiss };
 }
 
-// ── PROPS ──────────────────────────────────────────────────────
+// --- PROPS ---
 export interface BookingDetailViewProps {
     booking: Booking | null | undefined;
     isLoading: boolean;

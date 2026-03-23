@@ -49,7 +49,7 @@ const ResizableImageComponent: React.FC<ResizableImageComponentProps> = ({
     const [isResizing, setIsResizing] = useState(false);
     const [liveWidth,  setLiveWidth]  = useState<number | null>(null);
 
-    // Cleanup SEMUA listener aktif — dipanggil dari mana saja
+    // Cleanup SEMUA listener aktif - dipanggil dari mana saja
     const forceStopResize = useCallback(() => {
         if (cleanupRef.current) {
             cleanupRef.current();

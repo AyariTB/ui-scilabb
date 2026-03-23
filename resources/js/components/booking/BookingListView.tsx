@@ -35,7 +35,7 @@ import { formatIDR, formatShortDate, matchesStatusFilter } from './utils';
 
 import type { Booking, BookingStatusFilter, BookingFilters } from '@/types/booking.types';
 
-// ── TOAST ─────────────────────────────────────────────────────
+// ---TOAST ---
 type ToastType = 'success' | 'error' | 'info';
 interface ToastItem { id: string; type: ToastType; message: string }
 
@@ -64,7 +64,7 @@ function useToast() {
     return { toasts, push, dismiss };
 }
 
-// ── PROPS ──────────────────────────────────────────────────────
+// --- PROPS ---
 export interface BookingListViewProps {
     /** Judul halaman, misal: 'Daftar Pesanan' */
     title: string;

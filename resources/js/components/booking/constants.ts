@@ -1,8 +1,5 @@
 /**
- * BOOKING CONSTANTS — Konfigurasi visual dan opsi filter untuk fitur booking.
- * 
- * File ini dipindahkan dari pages/manager/bookings/ ke components/booking/
- * agar bisa dipakai bersama oleh role manager, admin, dan role lainnya.
+ * BOOKING CONSTANTS - Konfigurasi visual dan opsi filter untuk fitur booking.
  */
 
 import type { BookingStatus, PaymentStatus, BookingStatusFilter } from '@/types/booking.types';
