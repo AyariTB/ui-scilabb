@@ -2,22 +2,35 @@ import { useState, useMemo } from 'react';
 import { Plus, LayoutGrid, Beaker, Ship, FileText } from 'lucide-react';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { BookingListView } from '@/components/booking';
-import { useBookings } from '@/hooks/useBooking';
+import { CreateOrderModal } from '@/components/booking/modals';
+import { useBookings, bookingKeys } from '@/hooks/useBooking';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Booking } from '@/types/booking.types';
 
 export default function OrderList() {
-    const { data: bookings = [], isLoading } = useBookings();
-    
+    const queryClient = useQueryClient();
+    const { data: fetchedBookings = [], isLoading } = useBookings();
+
+    // Pesanan baru yang dibuat manual disimpan secara lokal sampai backend siap
+    const [manualBookings, setManualBookings] = useState<Booking[]>([]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Gabungkan data dari server dengan data manual lokal
+    const bookings = useMemo(
+        () => [...manualBookings, ...fetchedBookings],
+        [manualBookings, fetchedBookings]
+    );
+
     // Filter State Tipe Pesanan
     const [orderType, setOrderType] = useState<string>('SEMUA');
 
-    // Karena mock data belum memiliki order_type definitif, 
-    // kita gunakan pendekatan sederhana untuk memilah lab, kapal, sas
+    // Karena mock data belum memiliki order_type definitif,
+    // gunakan nama kegiatan/layanan sebagai proxy untuk kategorisasi
     const categorizeBooking = (b: Booking) => {
         const name = (b.activity_name || b.service_name || '').toLowerCase();
         if (name.includes('kapal') || name.includes('pelayaran') || name.includes('explorer')) return 'KAPAL';
         if (name.includes('stand') || name.includes('mandiri') || name.includes('sas')) return 'SAS';
-        return 'LAB'; // Default sebagian besar
+        return 'LAB';
     };
 
     const filteredBookings = useMemo(() => {
@@ -40,7 +53,7 @@ export default function OrderList() {
 
     const headerActions = (
         <button
-            onClick={() => alert('Fitur Tambah Pesanan (Manual) akan membuka Modal/Halaman Create Order')}
+            onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-navy-light"
         >
             <Plus size={16} /> Tambah Pesanan
@@ -144,6 +157,17 @@ export default function OrderList() {
 
     return (
         <AdminLayout>
+            <CreateOrderModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSubmit={(bookingBaru) => {
+                    // Sisipkan ke cache React Query agar halaman detail bisa menemukannya
+                    queryClient.setQueryData(bookingKeys.detail(bookingBaru.id), bookingBaru);
+                    // Tambahkan ke list lokal agar langsung terlihat di tabel
+                    setManualBookings((prev) => [bookingBaru, ...prev]);
+                    setIsCreateModalOpen(false);
+                }}
+            />
             <BookingListView
                 title="Semua Pesanan"
                 subtitle="Pantau dan kelola seluruh transaksi layanan Laboratorium, Kapal Riset, dan SAS."
