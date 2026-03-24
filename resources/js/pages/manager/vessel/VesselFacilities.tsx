@@ -1,13 +1,16 @@
 import ManagerLayout from '../../../components/layout/ManagerLayout';
+import AdminLayout from '../../../components/layout/AdminLayout';
 
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 export default function VesselFacilities() {
     const { slug } = useParams<{ slug: string }>();
+    const location = useLocation();
+    const Layout = location.pathname.startsWith('/admin') ? AdminLayout : ManagerLayout;
     const vesselName = slug === 'explorer-2' ? 'KR Unhas Explorer 2' : 'KR Unhas Explorer 1';
 
     return (
-        <ManagerLayout>
+        <Layout>
             <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold text-navy">Fasilitas Kapal</h1>
@@ -26,6 +29,6 @@ export default function VesselFacilities() {
                     </p>
                 </div>
             </div>
-        </ManagerLayout>
+        </Layout>
     );
 }

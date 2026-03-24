@@ -5,8 +5,9 @@ import {
     LogOut,
     Bell,
     Search,
+    ChevronDown,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { MenuSection, MenuItem } from "@/constants/menuConfig";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -36,16 +37,21 @@ interface SidebarItemProps {
     isActive: boolean;
     isCollapsed: boolean;
     onNavigate: (href: string) => void;
+    activePath: string;
+    expandedKey?: string | null;
+    onToggleExpand?: (key: string) => void;
 }
 
 /**
  * tooltip hover hanya re-render item individual,
  * bukan seluruh sidebar, saat user mengarahkan kursor.
  */
-function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemProps) {
+function SidebarItem({ item, isActive, isCollapsed, onNavigate, activePath, expandedKey, onToggleExpand }: SidebarItemProps) {
     const [isHovered, setIsHovered] = useState(false);
     const itemRef = useRef<HTMLDivElement>(null);
     const Icon = item.icon;
+    const hasSubItems = Boolean(item.subItems && item.subItems.length > 0);
+    const isExpanded = expandedKey === item.key;
 
     // Menghitung posisi Y secara real-time saat hover
     const [tooltipTop, setTooltipTop] = useState(0);
@@ -65,15 +71,21 @@ function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemPro
             onMouseLeave={() => setIsHovered(false)}
         >
             <button
-                onClick={() => onNavigate(item.href)}
+                onClick={() => {
+                    if (hasSubItems && onToggleExpand) {
+                        onToggleExpand(item.key);
+                    } else if (item.href) {
+                        onNavigate(item.href);
+                    }
+                }}
                 className={`
                     group flex w-full items-center gap-3 rounded-lg px-3 py-2.5
-                    transition-all duration-200 ease-out
+                    transition-all duration-300 ease-out relative
                     ${isCollapsed ? "justify-center" : ""}
                     ${
-                        isActive
+                        isActive && !hasSubItems
                             ? "bg-active-bg text-navy font-semibold"
-                            : "text-slate-muted hover:bg-hover-bg hover:text-navy"
+                            : "text-slate-muted hover:bg-slate-50 hover:text-navy"
                     }
                 `}
             >
@@ -86,44 +98,65 @@ function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemPro
                             : "text-slate-muted group-hover:text-navy"
                     }`}
                 />
-                <AnimatePresence mode="wait">
-                    {!isCollapsed && (
-                        <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            transition={{ duration: 0.15 }}
-                            className="truncate text-sm tracking-wide"
-                        >
+                {!isCollapsed && (
+                    <div className="flex flex-1 items-center justify-between overflow-hidden">
+                        <span className="truncate text-sm tracking-wide text-left flex-1">
                             {item.label}
-                        </motion.span>
-                    )}
-                </AnimatePresence>
+                        </span>
+                        {hasSubItems && (
+                            <ChevronDown 
+                                size={16} 
+                                className={`shrink-0 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+                            />
+                        )}
+                    </div>
+                )}
             </button>
+
+            {/* Render SubItems ketika di-expand dan sidebar tidak di-collapse */}
+            {hasSubItems && isExpanded && !isCollapsed && (
+                <div className="overflow-hidden">
+                    <div className="ml-11 mt-1 flex flex-col gap-1 pb-1 relative before:absolute before:inset-y-0 before:-left-[18px] before:w-px before:bg-slate-200">
+                        {item.subItems!.map((sub) => {
+                            const isSubActive = sub.href ? activePath.startsWith(sub.href) : false;
+                            return (
+                                <button
+                                    key={sub.key}
+                                    onClick={() => sub.href && onNavigate(sub.href)}
+                                    className={`
+                                        flex w-full items-center rounded-md px-3 py-[7px] text-[14px] transition-all duration-300 relative group-hover:bg-slate-50
+                                        ${
+                                            isSubActive 
+                                                ? "text-navy font-medium bg-active-bg/50 before:absolute before:left-[-18px] before:top-1/2 before:-translate-y-1/2 before:w-[19px] before:h-px before:bg-navy" 
+                                                : "text-slate-500 hover:text-navy hover:bg-slate-50 hover:translate-x-1 before:absolute before:left-[-18px] before:top-1/2 before:-translate-y-1/2 before:w-[19px] before:h-px before:bg-transparent hover:before:bg-slate-300"
+                                        }
+                                    `}
+                                >
+                                    <div className="truncate text-left w-full">{sub.label}</div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Floating tooltip saat sidebar collapsed (Portal supaya tidak terclip) */}
             {typeof document !== "undefined" && createPortal(
-                <AnimatePresence>
-                    {isCollapsed && isHovered && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -4 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -4 }}
-                            transition={{ duration: 0.15 }}
-                            style={{
-                                top: tooltipTop,
-                                left: SIDEBAR_WIDTH_COLLAPSED + 8, // Sedikit geser ke kanan dari sidebar
-                                transform: "translateY(-50%)",
-                            }}
-                            className="
-                                fixed z-[9999] whitespace-nowrap rounded bg-navy px-2.5 py-1.5
-                                text-xs font-medium text-white shadow-sm
-                            "
-                        >
-                            {item.label}
-                        </motion.div>
-                    )}
-                </AnimatePresence>,
+                (isCollapsed && isHovered) ? (
+                    <div
+                        style={{
+                            top: tooltipTop,
+                            left: SIDEBAR_WIDTH_COLLAPSED + 8, // Sedikit geser ke kanan dari sidebar
+                            transform: "translateY(-50%)",
+                        }}
+                        className="
+                            fixed z-[9999] whitespace-nowrap rounded bg-navy px-2.5 py-1.5
+                            text-xs font-medium text-white shadow-sm
+                        "
+                    >
+                        {item.label}
+                    </div>
+                ) : null,
                 document.body
             )}
         </div>
@@ -137,6 +170,8 @@ interface SidebarSectionProps {
     activePath: string;
     isCollapsed: boolean;
     onNavigate: (href: string) => void;
+    expandedKey: string | null;
+    onToggleExpand: (key: string) => void;
 }
 
 function SidebarSection({
@@ -144,29 +179,31 @@ function SidebarSection({
     activePath,
     isCollapsed,
     onNavigate,
+    expandedKey,
+    onToggleExpand,
 }: SidebarSectionProps) {
     return (
         <div className="space-y-1">
-            <AnimatePresence>
-                {!isCollapsed && (
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-label-muted"
-                    >
-                        {section.title}
-                    </motion.p>
-                )}
-            </AnimatePresence>
+            {!isCollapsed && (
+                <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-label-muted">
+                    {section.title}
+                </p>
+            )}
             {isCollapsed && <div className="mx-auto my-1 h-px w-6 bg-slate-border" />}
             {section.items.map((item) => (
                 <SidebarItem
                     key={item.key}
                     item={item}
-                    isActive={activePath.startsWith(item.href)}
+                    isActive={
+                        item.href
+                            ? activePath.startsWith(item.href)
+                            : item.subItems?.some(s => s.href && activePath.startsWith(s.href)) || false
+                    }
                     isCollapsed={isCollapsed}
                     onNavigate={onNavigate}
+                    activePath={activePath}
+                    expandedKey={expandedKey}
+                    onToggleExpand={onToggleExpand}
                 />
             ))}
         </div>
@@ -205,6 +242,33 @@ export default function DashboardLayout({
     });
     
     const activePath = location.pathname;
+    const navRef = useRef<HTMLElement>(null);
+    const [expandedKey, setExpandedKey] = useState<string | null>(null);
+
+    // Initial expand based on activePath
+    useEffect(() => {
+        let found = false;
+        outer: for (const sec of menuSections) {
+            for (const item of sec.items) {
+                if (item.subItems?.some(s => s.href && activePath.startsWith(s.href))) {
+                    setExpandedKey(item.key);
+                    found = true;
+                    break outer;
+                }
+            }
+        }
+    }, [activePath, menuSections]);
+
+    useEffect(() => {
+        const savedScroll = sessionStorage.getItem("sidebar_scroll_pos");
+        if (savedScroll && navRef.current) {
+            requestAnimationFrame(() => {
+                if (navRef.current) {
+                    navRef.current.scrollTop = parseInt(savedScroll, 10);
+                }
+            });
+        }
+    }, [activePath]);
 
     const toggleSidebar = useCallback(() => {
         setIsCollapsed((prev) => {
@@ -268,29 +332,22 @@ export default function DashboardLayout({
                         isCollapsed ? "justify-center" : "justify-between"
                     }`}
                 >
-                    <AnimatePresence>
-                        {!isCollapsed && (
-                            <motion.div 
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                className="flex items-center gap-2.5 overflow-hidden"
-                            >
-                                {/* Logo mark */}
-                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-                                    <img src="https://ukk.unhas.ac.id/assets/img/logo.png" alt="" />
-                                </div>
-                                <div className="leading-none whitespace-nowrap">
-                                    <h1 className="text-sm font-bold tracking-tight text-navy">
-                                        {platformTitle}
-                                    </h1>
-                                    <p className="mt-1 text-[12px] text-navy">
-                                        UKK UNHAS
-                                    </p>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {!isCollapsed && (
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                            {/* Logo mark */}
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                                <img src="https://ukk.unhas.ac.id/assets/img/logo.png" alt="" />
+                            </div>
+                            <div className="leading-none whitespace-nowrap">
+                                <h1 className="text-sm font-bold tracking-tight text-navy">
+                                    {platformTitle}
+                                </h1>
+                                <p className="mt-1 text-[12px] text-navy">
+                                    UKK UNHAS
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     <button
                         onClick={toggleSidebar}
@@ -313,7 +370,11 @@ export default function DashboardLayout({
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-4">
+                <nav 
+                    ref={navRef}
+                    onScroll={(e) => sessionStorage.setItem("sidebar_scroll_pos", String(e.currentTarget.scrollTop))}
+                    className="flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-4"
+                >
                     {menuSections.map((section) => (
                         <SidebarSection
                             key={section.title}
@@ -321,6 +382,8 @@ export default function DashboardLayout({
                             activePath={activePath}
                             isCollapsed={isCollapsed}
                             onNavigate={handleNavigate}
+                            expandedKey={expandedKey}
+                            onToggleExpand={(key) => setExpandedKey(prev => prev === key ? null : key)}
                         />
                     ))}
                 </nav>
@@ -342,23 +405,16 @@ export default function DashboardLayout({
                             {displayInitials}
                         </div>
 
-                        <AnimatePresence>
-                            {!isCollapsed && (
-                                <motion.div 
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    className="min-w-0 flex-1 overflow-hidden"
-                                >
-                                    <p className="truncate text-sm font-semibold text-navy">
-                                        {displayName}
-                                    </p>
-                                    <p className="truncate text-[11px] text-slate-muted">
-                                        {displayEmail}
-                                    </p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        {!isCollapsed && (
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                                <p className="truncate text-sm font-semibold text-navy">
+                                    {displayName}
+                                </p>
+                                <p className="truncate text-[11px] text-slate-muted">
+                                    {displayEmail}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </motion.aside>

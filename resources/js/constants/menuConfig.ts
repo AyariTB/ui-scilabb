@@ -21,8 +21,10 @@ export interface MenuItem {
     key: string;
     label: string;
     icon: LucideIcon;
-    /** URL tujuan (Inertia route) */
-    href: string;
+    /** URL tujuan (Inertia route), opsional jika memiliki submenu */
+    href?: string;
+    /** Optional submenu item untuk kapabilitas dropdown */
+    subItems?: Omit<MenuItem, "icon" | "subItems">[];
 }
 
 export interface MenuSection {
@@ -57,29 +59,88 @@ const ADMIN_MENU: MenuSection[] = [
         ],
     },
     {
-        title: "Layanan",
+        title: "Alat dan Layanan",
+        items: [
+                    {
+                        key: "labs",
+                        label: "Laboratorium",
+                        icon: FlaskConical,
+                        href: "/admin/labs",
+                    },
+                    {
+                        key: "services",
+                        label: "Layanan Pengujian",
+                        icon: FileText,
+                        href: "/admin/services",
+                    },
+                    {
+                        key: "tools",
+                        label: "Alat & Instrumen",
+                        icon: Wrench,
+                        href: "/admin/tools",
+                    },
+                ],
+    },
+    {
+        title: "Manajemen Kapal",
         items: [
             {
-                key: "labs",
-                label: "Laboratorium",
-                icon: FlaskConical,
-                href: "/admin/labs",
+                key: "admin-exp1",
+                label: "KR Explorer 1",
+                icon: Ship,
+                subItems: [
+                    {
+                        key: "admin-exp1-general",
+                        label: "Informasi Kapal",
+                        href: "/admin/explorer-1/general",
+                    },
+                    {
+                        key: "admin-exp1-tools",
+                        label: "Alat Kapal",
+                        href: "/admin/explorer-1/tools",
+                    },
+                    {
+                        key: "admin-exp1-facilities",
+                        label: "Fasilitas",
+                        href: "/admin/explorer-1/facilities",
+                    },
+                    {
+                        key: "admin-exp1-guides",
+                        label: "Panduan/SOP",
+                        href: "/admin/explorer-1/guides",
+                    },
+                ],
             },
             {
-                key: "services",
-                label: "Layanan Pengujian",
-                icon: Wrench,
-                href: "/admin/services",
-            },
-            {
-                key: "tools",
-                label: "Alat & Instrumen",
-                icon: Package,
-                href: "/admin/tools",
+                key: "admin-exp2",
+                label: "KR Explorer 2",
+                icon: Ship,
+                subItems: [
+                    {
+                        key: "admin-exp2-general",
+                        label: "Informasi Kapal",
+                        href: "/admin/explorer-2/general",
+                    },
+                    {
+                        key: "admin-exp2-tools",
+                        label: "Alat Kapal",
+                        href: "/admin/explorer-2/tools",
+                    },
+                    {
+                        key: "admin-exp2-facilities",
+                        label: "Fasilitas",
+                        href: "/admin/explorer-2/facilities",
+                    },
+                    {
+                        key: "admin-exp2-guides",
+                        label: "Panduan/SOP",
+                        href: "/admin/explorer-2/guides",
+                    },
+                ],
             },
         ],
     },
-    {
+        {
         title: "Konten",
         items: [
             {

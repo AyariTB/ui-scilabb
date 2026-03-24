@@ -6,21 +6,16 @@ import { COLORS } from "@/constants/colors";
 import {
     CreditCard,
     TrendingUp,
-    Anchor
+    Anchor,
+    ArrowUpRight
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { ExportActions } from "@/components/ui/ExportActions";
 import { exportToCSV, exportToPDF } from "@/lib/export";
-import {
-    BarChart,
-    LineChart,
-    Bar,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip as RechartsTooltip,
-    ResponsiveContainer,
-} from "recharts";
+import { RecentOrdersTable } from "@/components/booking/RecentOrdersTable";
+import { MOCK_BOOKINGS } from "@/mocks/booking.mock";
+import { IncomeChartWidget } from "@/components/ui/IncomeChartWidget";
+import { TrendChartWidget } from "@/components/ui/TrendChartWidget";
 
 // --- Mock Data ---
 const MOCK_STATS = [
@@ -52,30 +47,6 @@ const MOCK_STATS = [
     },
 ] as const;
 
-const MOCK_RECENT_ORDERS = [
-    {
-        id: "PES-0045",
-        booker: "Andi Pratama",
-        dates: "20–25 Mar 2025",
-        statusLabel: "Menunggu Verifikasi Pesanan",
-        statusVariant: "warning" as const,
-    },
-    {
-        id: "PES-0044",
-        booker: "Siti Rahayu",
-        dates: "15–18 Mar 2025",
-        statusLabel: "Menunggu Verifikasi Pembayaran",
-        statusVariant: "warning" as const,
-    },
-    {
-        id: "PES-0043",
-        booker: "Dr. Budi Santoso",
-        dates: "10–16 Feb 2025",
-        statusLabel: "Terverifikasi (Lunas)",
-        statusVariant: "success" as const,
-    },
-] as const;
-
 const MOCK_CHART_DATA = [
     { name: "Jan", pendapatan: 20000000, pesanan: 4 },
     { name: "Feb", pendapatan: 45000000, pesanan: 8 },
@@ -90,6 +61,7 @@ const MONTHS_MAP: Record<string, number> = {
 };
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     // State untuk rentang tanggal grafik pendapatan
     const [revDate, setRevDate] = useState({
         start: "2025-01-01",
@@ -203,136 +175,26 @@ export default function Dashboard() {
                     {/* Charts Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Grafik Pendapatan */}
-                        <div className="flex flex-col rounded-xl border border-slate-border bg-white">
-                            <div className="flex items-center justify-between border-b border-slate-border px-6 py-4">
-                                <div>
-                                    <h2 className="text-sm font-bold text-navy">
-                                        Grafik Pendapatan
-                                    </h2>
-                                    <p className="text-xs text-slate-muted">
-                                        Total nominal penyewaan tahun 2025
-                                    </p>
-                                </div>
-                                <ExportActions 
-                                    startDate={revDate.start}
-                                    endDate={revDate.end}
-                                    onDateChange={(start, end) => setRevDate({ start, end })}
-                                    onExportCSV={() => handleExportRev("csv")}
-                                    onExportPDF={() => handleExportRev("pdf")}
-                                />
-                            </div>
-                            <div className="p-6">
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={filteredRevData}>
-                                        <CartesianGrid
-                                            strokeDasharray="3 3"
-                                            vertical={false}
-                                            stroke={COLORS.chart.grid}
-                                        />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 12, fill: COLORS.chart.text }}
-                                            dy={10}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 12, fill: COLORS.chart.text }}
-                                            tickFormatter={(value) =>
-                                                `Rp ${value / 1000000}Jt`
-                                            }
-                                            dx={-10}
-                                        />
-                                        <RechartsTooltip
-                                            cursor={{ fill: COLORS.chart.tooltipBg }}
-                                            contentStyle={{
-                                                borderRadius: "8px",
-                                                border: `1px solid ${COLORS.chart.grid}`,
-                                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                            }}
-                                            formatter={(value: any) => [
-                                                `Rp ${Number(value).toLocaleString("id-ID")}`,
-                                                "Pendapatan",
-                                            ]}
-                                        />
-                                        <Bar
-                                            dataKey="pendapatan"
-                                            name="Pendapatan"
-                                            fill={COLORS.chart.primary}
-                                            radius={[4, 4, 0, 0]}
-                                            maxBarSize={48}
-                                        />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                        <IncomeChartWidget
+                            title="Grafik Pendapatan"
+                            subtitle="Total nominal penyewaan"
+                            data={filteredRevData}
+                            dateRange={revDate}
+                            onDateChange={(start, end) => setRevDate({ start, end })}
+                            onExportCSV={() => handleExportRev("csv")}
+                            onExportPDF={() => handleExportRev("pdf")}
+                        />
 
                         {/* Grafik Jumlah Pengajuan */}
-                        <div className="flex flex-col rounded-xl border border-slate-border bg-white">
-                            <div className="flex items-center justify-between border-b border-slate-border px-6 py-4">
-                                <div>
-                                    <h2 className="text-sm font-bold text-navy">
-                                        Grafik Pengajuan Sewa
-                                    </h2>
-                                    <p className="text-xs text-slate-muted">
-                                        Total frekuensi pengajuan tahun 2025
-                                    </p>
-                                </div>
-                                <ExportActions 
-                                    startDate={reqDate.start}
-                                    endDate={reqDate.end}
-                                    onDateChange={(start, end) => setReqDate({ start, end })}
-                                    onExportCSV={() => handleExportReq("csv")}
-                                    onExportPDF={() => handleExportReq("pdf")}
-                                />
-                            </div>
-                            <div className="p-6">
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <LineChart data={filteredReqData}>
-                                        <CartesianGrid
-                                            strokeDasharray="3 3"
-                                            vertical={false}
-                                            stroke={COLORS.chart.grid}
-                                        />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 12, fill: COLORS.chart.text }}
-                                            dy={10}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fontSize: 12, fill: COLORS.chart.text }}
-                                            dx={-10}
-                                        />
-                                        <RechartsTooltip
-                                            contentStyle={{
-                                                borderRadius: "8px",
-                                                border: `1px solid ${COLORS.chart.grid}`,
-                                                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-                                            }}
-                                            formatter={(value: any) => [
-                                                `${value} Pengajuan`,
-                                                "Jumlah Sewaan",
-                                            ]}
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="pesanan"
-                                            name="Jumlah Sewaan"
-                                            stroke={COLORS.chart.primary}
-                                            strokeWidth={3}
-                                            dot={{ r: 4, strokeWidth: 2, fill: COLORS.chart.primary }}
-                                            activeDot={{ r: 6 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                        <TrendChartWidget
+                            title="Grafik Pengajuan Sewa"
+                            subtitle="Total frekuensi pengajuan"
+                            data={filteredReqData}
+                            dateRange={reqDate}
+                            onDateChange={(start, end) => setReqDate({ start, end })}
+                            onExportCSV={() => handleExportReq("csv")}
+                            onExportPDF={() => handleExportReq("pdf")}
+                        />
                     </div>
 
                     {/* Pesanan Terbaru (Table) */}
@@ -347,64 +209,21 @@ export default function Dashboard() {
                                 </p>
                             </div>
                             <button
-                                className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                onClick={() => navigate("/manager/orders")}
+                                className="
+                                    flex items-center gap-1.5 rounded-lg px-3 py-1.5
+                                    text-[11px] font-semibold text-label-muted transition-all
+                                    hover:bg-hover-bg hover:text-navy
+                                "
                             >
-                                Lihat Semua
+                                <span>Lihat Semua</span>
+                                <ArrowUpRight size={14} />
                             </button>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[600px]">
-                                <thead>
-                                    <tr className="border-b border-slate-border bg-soft-white">
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            ID Pesanan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Pemesan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Waktu Sewa
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Aksi
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {MOCK_RECENT_ORDERS.map((order) => (
-                                        <tr
-                                            key={order.id}
-                                            className="
-                                                border-b border-slate-border last:border-none
-                                                transition-colors hover:bg-soft-white
-                                            "
-                                        >
-                                            <td className="px-6 py-3.5 text-sm font-medium text-navy">
-                                                {order.id}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-sm text-text-secondary">
-                                                {order.booker}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-sm text-text-secondary flex items-center gap-1.5">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-slate-border" />
-                                                {order.dates}
-                                            </td>
-                                            <td className="px-6 py-3.5">
-                                                <Badge variant={order.statusVariant}>{order.statusLabel}</Badge>
-                                            </td>
-                                            <td className="px-6 py-3.5 text-right">
-                                                <button className="rounded-lg border border-slate-border px-3 py-1.5 text-xs font-semibold text-navy transition-colors hover:bg-soft-white">
-                                                    Lihat Detail
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <RecentOrdersTable 
+                            bookings={MOCK_BOOKINGS.slice(0, 5)} 
+                            detailBaseUrl="/manager/orders" 
+                        />
                     </div>
                 </div>
             </div>

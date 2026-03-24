@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AdminLayout from "@/components/layout/AdminLayout";
 import {
     Users,
@@ -8,7 +9,17 @@ import {
     ArrowDownRight,
     MoreHorizontal,
     Clock,
+    ExternalLink,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { StatCard } from "@/components/ui/StatCard";
+import { RecentOrdersTable } from "@/components/booking/RecentOrdersTable";
+import { MOCK_BOOKINGS } from "@/mocks/booking.mock";
+import { IncomeChartWidget } from "@/components/ui/IncomeChartWidget";
+import { TrendChartWidget } from "@/components/ui/TrendChartWidget";
+import { RevenueTrendWidget } from "@/components/ui/RevenueTrendWidget";
+import { PopularServicesWidget } from "@/components/ui/PopularServicesWidget";
+import { exportToCSV, exportToPDF } from "@/lib/export";
 
 // --- Mock Data ---
 // Data statistik ini nantinya akan diganti dengan data real dari API.
@@ -53,82 +64,147 @@ const MOCK_STATS = [
     },
 ] as const;
 
-const MOCK_RECENT_ORDERS = [
-    {
-        id: "ORD-2024-001",
-        customer: "Dr. Andi Pratama",
-        service: "Pengujian XRF",
-        status: "completed" as const,
-        amount: "Rp 2.500.000",
-        time: "2 jam lalu",
-    },
-    {
-        id: "ORD-2024-002",
-        customer: "Prof. Sari Wulandari",
-        service: "Analisis SEM",
-        status: "processing" as const,
-        amount: "Rp 4.200.000",
-        time: "5 jam lalu",
-    },
-    {
-        id: "ORD-2024-003",
-        customer: "Mahasiswa - Kelompok B",
-        service: "Uji Viskositas",
-        status: "pending" as const,
-        amount: "Rp 850.000",
-        time: "1 hari lalu",
-    },
-    {
-        id: "ORD-2024-004",
-        customer: "PT. Mineral Nusantara",
-        service: "Pengujian AAS",
-        status: "completed" as const,
-        amount: "Rp 6.100.000",
-        time: "1 hari lalu",
-    },
-    {
-        id: "ORD-2024-005",
-        customer: "Dr. Budi Santoso",
-        service: "Analisis FTIR",
-        status: "processing" as const,
-        amount: "Rp 3.750.000",
-        time: "2 hari lalu",
-    },
-] as const;
+const MOCK_PROVIDER_INCOME = [
+    { name: "Lab Kimia", pendapatan: 45000000, pesanan: 12 },
+    { name: "Lab Biologi", pendapatan: 32000000, pesanan: 8 },
+    { name: "Lab Geologi", pendapatan: 58000000, pesanan: 15 },
+    { name: "Kapal Riset", pendapatan: 120000000, pesanan: 4 },
+];
 
-// --- Helper: Status Badge ---
+const MOCK_TREND_DATA = [
+    { name: "Jan", pesanan: 14 },
+    { name: "Feb", pesanan: 28 },
+    { name: "Mar", pesanan: 45 },
+    { name: "Apr", pesanan: 32 },
+    { name: "Mei", pesanan: 18 },
+    { name: "Jun", pesanan: 26 },
+];
 
-const STATUS_CONFIG = {
-    completed: {
-        label: "Selesai",
-        className: "bg-emerald-50 text-emerald-700",
-    },
-    processing: {
-        label: "Diproses",
-        className: "bg-blue-50 text-blue-700",
-    },
-    pending: {
-        label: "Menunggu",
-        className: "bg-amber-50 text-amber-700",
-    },
-} as const;
+const MOCK_OVERALL_REVENUE = [
+    { name: "Jan", pendapatan: 154000000 },
+    { name: "Feb", pendapatan: 210000000 },
+    { name: "Mar", pendapatan: 185000000 },
+    { name: "Apr", pendapatan: 320000000 },
+    { name: "Mei", pendapatan: 280000000 },
+    { name: "Jun", pendapatan: 160000000 },
+];
 
-type OrderStatus = keyof typeof STATUS_CONFIG;
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-    const config = STATUS_CONFIG[status];
-    return (
-        <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${config.className}`}
-        >
-            {config.label}
-        </span>
-    );
-}
+const MOCK_POPULAR_SERVICES = [
+    { name: "Uji SEM", total: 45, diterima: 40, ditolak: 5, penyedia: "Lab Geologi" },
+    { name: "Uji XRD", total: 38, diterima: 35, ditolak: 3, penyedia: "Lab Kimia" },
+    { name: "Sewa Kapal", total: 24, diterima: 20, ditolak: 4, penyedia: "Kapal Utama" },
+    { name: "Uji Tarik", total: 18, diterima: 18, ditolak: 0, penyedia: "Lab Fisika" },
+    { name: "Sewa Lab", total: 12, diterima: 10, ditolak: 2, penyedia: "Lab Biologi" },
+];
 
 // --- Komponen Utama ---
 
 export default function Dashboard() {
+    const navigate = useNavigate();
+    const [revDate, setRevDate] = useState({
+        start: "2025-01-01",
+        end: "2025-12-31",
+    });
+    const [reqDate, setReqDate] = useState({
+        start: "2025-01-01",
+        end: "2025-12-31",
+    });
+    const [overallRevDate, setOverallRevDate] = useState({
+        start: "2025-01-01",
+        end: "2025-12-31",
+    });
+    const [popularSvcDate, setPopularSvcDate] = useState({
+        start: "2025-01-01",
+        end: "2025-12-31",
+    });
+
+    const filteredProviderIncome = MOCK_PROVIDER_INCOME;
+    const filteredTrendData = MOCK_TREND_DATA;
+    const filteredOverallRevenue = MOCK_OVERALL_REVENUE;
+    const filteredPopularServices = MOCK_POPULAR_SERVICES;
+
+    const handleExportRev = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Penyedia Layanan", key: "name" },
+            { label: "Pendapatan (IDR)", key: "pendapatan" },
+            { label: "Jumlah Pesanan", key: "pesanan" },
+        ];
+        const filename = `Laporan_Pendapatan_Penyedia_${revDate.start}_${revDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredProviderIncome, filename, headers);
+        } else {
+            exportToPDF(
+                filteredProviderIncome, 
+                filename, 
+                "Laporan Pendapatan per Penyedia Layanan", 
+                headers,
+                (key, val) => key === "pendapatan" ? `Rp ${Number(val).toLocaleString("id-ID")}` : val
+            );
+        }
+    };
+
+    const handleExportReq = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Bulan", key: "name" },
+            { label: "Jumlah Pesanan", key: "pesanan" },
+        ];
+        const filename = `Laporan_Tren_Pesanan_${reqDate.start}_${reqDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredTrendData, filename, headers);
+        } else {
+            exportToPDF(
+                filteredTrendData, 
+                filename, 
+                "Laporan Tren Pesanan", 
+                headers
+            );
+        }
+    };
+
+    const handleExportOverallRev = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Bulan", key: "name" },
+            { label: "Pendapatan Keseluruhan (IDR)", key: "pendapatan" },
+        ];
+        const filename = `Laporan_Pendapatan_Keseluruhan_${overallRevDate.start}_${overallRevDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredOverallRevenue, filename, headers);
+        } else {
+            exportToPDF(
+                filteredOverallRevenue, 
+                filename, 
+                "Laporan Tren Pendapatan Keseluruhan", 
+                headers,
+                (key, val) => key === "pendapatan" ? `Rp ${Number(val).toLocaleString("id-ID")}` : val
+            );
+        }
+    };
+
+    const handleExportPopularSvc = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Layanan", key: "name" },
+            { label: "Penyedia", key: "penyedia" },
+            { label: "Total Dipesan", key: "total" },
+            { label: "Diterima", key: "diterima" },
+            { label: "Ditolak", key: "ditolak" },
+        ];
+        const filename = `Laporan_Layanan_Terpopuler_${popularSvcDate.start}_${popularSvcDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredPopularServices, filename, headers);
+        } else {
+            exportToPDF(
+                filteredPopularServices, 
+                filename, 
+                "Laporan Layanan Paling Banyak Dipesan", 
+                headers
+            );
+        }
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-6">
@@ -144,65 +220,62 @@ export default function Dashboard() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    {MOCK_STATS.map((stat) => {
-                        const Icon = stat.icon;
-                        const isUp = stat.trend === "up";
+                    {MOCK_STATS.map((stat) => (
+                        <StatCard
+                            key={stat.key}
+                            label={stat.label}
+                            value={stat.value}
+                            icon={stat.icon}
+                            change={stat.change}
+                            trend={stat.trend}
+                            description={stat.description}
+                        />
+                    ))}
+                </div>
 
-                        return (
-                            <div
-                                key={stat.key}
-                                className="
-                                    group relative overflow-hidden rounded-xl
-                                    border border-slate-border bg-white p-6
-                                    transition-all duration-200
-                                    hover:border-label-muted hover:shadow-sm
-                                "
-                            >
-                                <div className="flex items-start justify-between">
-                                    <div className="space-y-2">
-                                        <p className="text-xs font-medium uppercase tracking-wider text-slate-muted">
-                                            {stat.label}
-                                        </p>
-                                        <p className="text-2xl font-bold text-navy">
-                                            {stat.value}
-                                        </p>
-                                    </div>
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-soft-white">
-                                        <Icon
-                                            size={20}
-                                            className="text-slate-muted"
-                                        />
-                                    </div>
-                                </div>
+                {/* Charts Grid 1 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <RevenueTrendWidget
+                        title="Tren Pendapatan Keseluruhan"
+                        subtitle="Akumulasi pendapatan per bulan di platform"
+                        data={filteredOverallRevenue}
+                        dateRange={overallRevDate}
+                        onDateChange={(start, end) => setOverallRevDate({ start, end })}
+                        onExportCSV={() => handleExportOverallRev("csv")}
+                        onExportPDF={() => handleExportOverallRev("pdf")}
+                    />
+                    <TrendChartWidget
+                        title="Grafik Analisis Tren Pesanan"
+                        subtitle={`Total frekuensi pesanan seluruh fasilitas`}
+                        data={filteredTrendData}
+                        dateRange={reqDate}
+                        onDateChange={(start, end) => setReqDate({ start, end })}
+                        onExportCSV={() => handleExportReq("csv")}
+                        onExportPDF={() => handleExportReq("pdf")}
+                    />
+                </div>
 
-                                <div className="mt-3 flex items-center gap-1.5">
-                                    {isUp ? (
-                                        <ArrowUpRight
-                                            size={14}
-                                            className="text-emerald-500"
-                                        />
-                                    ) : (
-                                        <ArrowDownRight
-                                            size={14}
-                                            className="text-red-500"
-                                        />
-                                    )}
-                                    <span
-                                        className={`text-xs font-semibold ${
-                                            isUp
-                                                ? "text-emerald-600"
-                                                : "text-red-500"
-                                        }`}
-                                    >
-                                        {stat.change}
-                                    </span>
-                                    <span className="text-xs text-slate-muted">
-                                        {stat.description}
-                                    </span>
-                                </div>
-                            </div>
-                        );
-                    })}
+                {/* Charts Grid 2 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <IncomeChartWidget
+                        title="Grafik Pendapatan per Penyedia Layanan"
+                        subtitle={`Total pendapatan dari berbagai jenis layanan`}
+                        data={filteredProviderIncome}
+                        dateRange={revDate}
+                        onDateChange={(start, end) => setRevDate({ start, end })}
+                        onExportCSV={() => handleExportRev("csv")}
+                        onExportPDF={() => handleExportRev("pdf")}
+                    />
+                    
+                    <PopularServicesWidget
+                        title="Layanan Paling Banyak Dipesan"
+                        subtitle="Peringkat 5 layanan dengan pesanan terbanyak"
+                        data={filteredPopularServices}
+                        dateRange={popularSvcDate}
+                        onDateChange={(start, end) => setPopularSvcDate({ start, end })}
+                        onExportCSV={() => handleExportPopularSvc("csv")}
+                        onExportPDF={() => handleExportPopularSvc("pdf")}
+                    />
                 </div>
 
                 {/* Content Grid: Table + Activity */}
@@ -219,69 +292,22 @@ export default function Dashboard() {
                                 </p>
                             </div>
                             <button
+                                onClick={() => navigate("/admin/orders")}
                                 className="
-                                    flex h-8 w-8 items-center justify-center rounded-lg
-                                    text-slate-muted transition-colors
+                                    flex items-center gap-1.5 rounded-lg px-3 py-1.5
+                                    text-[11px] font-semibold text-label-muted transition-all
                                     hover:bg-hover-bg hover:text-navy
                                 "
-                                aria-label="Opsi lainnya"
                             >
-                                <MoreHorizontal size={16} />
+                                <span>Lihat Semua</span>
+                                <ArrowUpRight size={14} />
                             </button>
                         </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[600px]">
-                                <thead>
-                                    <tr className="border-b border-slate-border bg-soft-white">
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            ID Pesanan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Pelanggan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Layanan
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-muted">
-                                            Jumlah
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {MOCK_RECENT_ORDERS.map((order) => (
-                                        <tr
-                                            key={order.id}
-                                            className="
-                                                border-b border-slate-border last:border-none
-                                                transition-colors hover:bg-soft-white
-                                            "
-                                        >
-                                            <td className="px-6 py-3.5 text-sm font-medium text-navy">
-                                                {order.id}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-sm text-text-secondary">
-                                                {order.customer}
-                                            </td>
-                                            <td className="px-6 py-3.5 text-sm text-text-secondary">
-                                                {order.service}
-                                            </td>
-                                            <td className="px-6 py-3.5">
-                                                <StatusBadge
-                                                    status={order.status}
-                                                />
-                                            </td>
-                                            <td className="px-6 py-3.5 text-right text-sm font-semibold text-navy">
-                                                {order.amount}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <RecentOrdersTable 
+                            bookings={MOCK_BOOKINGS.slice(0, 5)} 
+                            detailBaseUrl="/admin/orders" 
+                        />
                     </div>
 
                     {/* Activity Feed */}

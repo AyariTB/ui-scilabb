@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Edit3, Save, ImagePlus, ChevronLeft, ChevronRight, Trash2, Plus } from 'lucide-react';
 import ManagerLayout from '@/components/layout/ManagerLayout';
+import AdminLayout from '@/components/layout/AdminLayout';
 import { RichTextEditor } from '../../../components/ui/RichTextEditor';
 import { VesselData } from '../../../types/vessel.types';
 
-import { useParams } from 'react-router-dom';
 import { MOCK_VESSEL_EXPLORER_1, MOCK_VESSEL_EXPLORER_2 } from '../../../mocks/vessel.mock';
 
 export default function VesselInfo() {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
+    
+    const Layout = location.pathname.startsWith('/admin') ? AdminLayout : ManagerLayout;
     
     // Pilih data berdasarkan slug
     const initialData = slug === 'explorer-2' ? MOCK_VESSEL_EXPLORER_2 : MOCK_VESSEL_EXPLORER_1;
@@ -39,7 +42,7 @@ export default function VesselInfo() {
     };
 
     return (
-        <ManagerLayout>
+        <Layout>
             <div className="max-w-6xl mx-auto space-y-6 pb-20">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -243,6 +246,6 @@ export default function VesselInfo() {
                     </div>
                 </div>
             </div>
-        </ManagerLayout>
+        </Layout>
     );
 }

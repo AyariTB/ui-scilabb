@@ -55,6 +55,11 @@ if (container) {
                     <Route path="/manager/:slug/tools" element={<VesselEquipment />} />
                     <Route path="/manager/:slug/facilities" element={<VesselFacilities />} />
                     <Route path="/manager/:slug/guides" element={<VesselGuides />} />
+
+                    <Route path="/admin/:slug/general" element={<VesselInfo />} />
+                    <Route path="/admin/:slug/tools" element={<VesselEquipment />} />
+                    <Route path="/admin/:slug/facilities" element={<VesselFacilities />} />
+                    <Route path="/admin/:slug/guides" element={<VesselGuides />} />
                     
                     {/* 404 Fallback */}
                     <Route path="*" element={

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ManagerLayout from '../../../components/layout/ManagerLayout';
+import AdminLayout from '../../../components/layout/AdminLayout';
 import { Plus, Edit2, Trash2, FileText, Search, Download, X, Paperclip } from 'lucide-react';
 import { RichTextEditor } from '../../../components/ui/RichTextEditor';
 import { DataTable, type TableColumn } from '../../../components/ui/Table';
@@ -36,10 +37,12 @@ const MOCK_GUIDES: Guide[] = [
 
 const CATEGORIES = ['Keselamatan', 'Teknis', 'Operasional', 'Administrasi'];
 
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 export default function VesselGuides() {
     const { slug } = useParams<{ slug: string }>();
+    const location = useLocation();
+    const Layout = location.pathname.startsWith('/admin') ? AdminLayout : ManagerLayout;
     const vesselName = slug === 'explorer-2' ? 'KR Unhas Explorer 2' : 'KR Unhas Explorer 1';
 
     const [guides, setGuides] = useState<Guide[]>(MOCK_GUIDES);
@@ -193,7 +196,7 @@ export default function VesselGuides() {
     ];
 
     return (
-        <ManagerLayout>
+        <Layout>
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -360,6 +363,6 @@ export default function VesselGuides() {
                     </div>
                 </div>
             )}
-        </ManagerLayout>
+        </Layout>
     );
 }

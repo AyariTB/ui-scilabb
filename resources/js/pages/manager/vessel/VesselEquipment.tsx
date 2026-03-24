@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ManagerLayout from '../../../components/layout/ManagerLayout';
+import AdminLayout from '../../../components/layout/AdminLayout';
 import { Plus, Edit2, Trash2, Search, Camera } from 'lucide-react';
 import { DataTable, type TableColumn } from '../../../components/ui/Table';
 import { VesselEquipment } from '../../../types/vessel.types';
@@ -7,10 +8,12 @@ import { MOCK_EQUIPMENT } from '../../../mocks/vessel.mock';
 import { Modal } from '../../../components/ui/Modal';
 import { ConfirmModal } from '../../../components/shared/ConfirmModal';
 import EquipmentForm from './components/EquipmentForm';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 export default function VesselEquipmentList() {
     const { slug } = useParams<{ slug: string }>();
+    const location = useLocation();
+    const Layout = location.pathname.startsWith('/admin') ? AdminLayout : ManagerLayout;
     
     // Mapping slug ke Nama Tampilan
     const vesselName = slug === 'explorer-2' ? 'KR Unhas Explorer 2' : 'KR Unhas Explorer 1';
@@ -175,7 +178,7 @@ export default function VesselEquipmentList() {
     ];
 
     return (
-        <ManagerLayout>
+        <Layout>
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -266,6 +269,6 @@ export default function VesselEquipmentList() {
                 variant="danger"
                 loading={loading}
             />
-        </ManagerLayout>
+        </Layout>
     );
 }
