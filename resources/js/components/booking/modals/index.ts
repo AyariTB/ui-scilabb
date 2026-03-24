@@ -8,3 +8,5 @@ export { NegotiatePriceModal } from './NegotiatePriceModal';
 export { AddNoteModal } from './AddNoteModal';
 export { VerifyPaymentChoiceModal } from './VerifyPaymentChoiceModal';
 export { ImageZoomModal } from './ImageZoomModal';
+export { CreateOrderModal } from './CreateOrderModal';
+export type { CreateOrderModalProps } from './CreateOrderModal';

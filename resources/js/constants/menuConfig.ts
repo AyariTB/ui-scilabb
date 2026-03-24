@@ -7,7 +7,6 @@ import {
     Wrench,
     Ship,
     CalendarDays,
-    ClipboardList,
     BarChart3,
     Package,
     type LucideIcon,
@@ -111,7 +110,7 @@ const HEAD_OF_LAB_MENU: MenuSection[] = [
             {
                 key: "orders",
                 label: "Pesanan Masuk",
-                icon: ClipboardList,
+                icon: ShoppingCart,
                 href: "/head-of-lab/orders",
             },
             {
@@ -148,7 +147,7 @@ const MANAGER_MENU: MenuSection[] = [
             {
                 key: "orders",
                 label: "Pesanan",
-                icon: ClipboardList,
+                icon: ShoppingCart,
                 href: "/manager/orders",
             },
             {
