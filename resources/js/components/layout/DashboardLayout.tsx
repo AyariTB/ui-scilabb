@@ -86,11 +86,19 @@ function SidebarItem({ item, isActive, isCollapsed, onNavigate }: SidebarItemPro
                             : "text-slate-muted group-hover:text-navy"
                     }`}
                 />
-                {!isCollapsed && (
-                    <span className="truncate text-sm tracking-wide">
-                        {item.label}
-                    </span>
-                )}
+                <AnimatePresence mode="wait">
+                    {!isCollapsed && (
+                        <motion.span
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{ duration: 0.15 }}
+                            className="truncate text-sm tracking-wide"
+                        >
+                            {item.label}
+                        </motion.span>
+                    )}
+                </AnimatePresence>
             </button>
 
             {/* Floating tooltip saat sidebar collapsed (Portal supaya tidak terclip) */}
@@ -139,11 +147,18 @@ function SidebarSection({
 }: SidebarSectionProps) {
     return (
         <div className="space-y-1">
-            {!isCollapsed && (
-                <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-label-muted">
-                    {section.title}
-                </p>
-            )}
+            <AnimatePresence>
+                {!isCollapsed && (
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.12em] text-label-muted"
+                    >
+                        {section.title}
+                    </motion.p>
+                )}
+            </AnimatePresence>
             {isCollapsed && <div className="mx-auto my-1 h-px w-6 bg-slate-border" />}
             {section.items.map((item) => (
                 <SidebarItem
@@ -199,6 +214,19 @@ export default function DashboardLayout({
         });
     }, []);
 
+    // Shortcut Ctrl + B untuk toggle sidebar
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+                e.preventDefault();
+                toggleSidebar();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [toggleSidebar]);
+
     const handleNavigate = useCallback((href: string) => {
         navigate(href);
     }, [navigate]);
@@ -221,9 +249,14 @@ export default function DashboardLayout({
         <div className="flex h-screen overflow-hidden bg-soft-white">
             {/* --- Sidebar --- */}
             <motion.aside
-                initial={ false }
+                initial={false}
                 animate={{ width: currentWidth }}
-                transition={{ duration: TRANSITION_DURATION, ease: "easeInOut" }}
+                transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                    restDelta: 0.001
+                }}
                 className="
                     relative flex h-full shrink-0 flex-col
                     border-r border-slate-border bg-white
@@ -235,22 +268,29 @@ export default function DashboardLayout({
                         isCollapsed ? "justify-center" : "justify-between"
                     }`}
                 >
-                    {!isCollapsed && (
-                        <div className="flex items-center gap-2.5">
-                            {/* Logo mark */}
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
-                                <img src="https://ukk.unhas.ac.id/assets/img/logo.png" alt="" />
-                            </div>
-                            <div className="leading-none">
-                                <h1 className="text-sm font-bold tracking-tight text-navy">
-                                    {platformTitle}
-                                </h1>
-                                <p className="mt-1 text-[12px] text-navy">
-                                    UKK UNHAS
-                                </p>
-                            </div>
-                        </div>
-                    )}
+                    <AnimatePresence>
+                        {!isCollapsed && (
+                            <motion.div 
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                className="flex items-center gap-2.5 overflow-hidden"
+                            >
+                                {/* Logo mark */}
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                                    <img src="https://ukk.unhas.ac.id/assets/img/logo.png" alt="" />
+                                </div>
+                                <div className="leading-none whitespace-nowrap">
+                                    <h1 className="text-sm font-bold tracking-tight text-navy">
+                                        {platformTitle}
+                                    </h1>
+                                    <p className="mt-1 text-[12px] text-navy">
+                                        UKK UNHAS
+                                    </p>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <button
                         onClick={toggleSidebar}
@@ -259,6 +299,7 @@ export default function DashboardLayout({
                             text-slate-muted transition-colors duration-200
                             hover:bg-hover-bg hover:text-navy
                         "
+                        title={isCollapsed ? "Expand sidebar (Ctrl + B)" : "Collapse sidebar (Ctrl + B)"}
                         aria-label={
                             isCollapsed ? "Perluas sidebar" : "Kecilkan sidebar"
                         }
@@ -301,16 +342,23 @@ export default function DashboardLayout({
                             {displayInitials}
                         </div>
 
-                        {!isCollapsed && (
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold text-navy">
-                                    {displayName}
-                                </p>
-                                <p className="truncate text-[11px] text-slate-muted">
-                                    {displayEmail}
-                                </p>
-                            </div>
-                        )}
+                        <AnimatePresence>
+                            {!isCollapsed && (
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    className="min-w-0 flex-1 overflow-hidden"
+                                >
+                                    <p className="truncate text-sm font-semibold text-navy">
+                                        {displayName}
+                                    </p>
+                                    <p className="truncate text-[11px] text-slate-muted">
+                                        {displayEmail}
+                                    </p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </motion.aside>

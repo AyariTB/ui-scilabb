@@ -1,13 +1,15 @@
+import { useState } from "react";
 import ManagerLayout from "@/components/layout/ManagerLayout";
 import { StatCard } from "@/components/ui/StatCard";
 import { Badge } from "@/components/ui/Badge";
 import { COLORS } from "@/constants/colors";
 import {
-    TrendingUp,
-    Anchor,
     CreditCard,
-    FileDown,
+    TrendingUp,
+    Anchor
 } from "lucide-react";
+import { ExportActions } from "@/components/ui/ExportActions";
+import { exportToCSV, exportToPDF } from "@/lib/export";
 import {
     BarChart,
     LineChart,
@@ -83,7 +85,91 @@ const MOCK_CHART_DATA = [
     { name: "Jun", pendapatan: 0, pesanan: 0 },
 ];
 
+const MONTHS_MAP: Record<string, number> = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, Mei: 4, Jun: 5, Jul: 6, Agu: 7, Sep: 8, Okt: 9, Nov: 10, Des: 11
+};
+
 export default function Dashboard() {
+    // State untuk rentang tanggal grafik pendapatan
+    const [revDate, setRevDate] = useState({
+        start: "2025-01-01",
+        end: "2025-06-30",
+    });
+
+    // State untuk rentang tanggal grafik pengajuan
+    const [reqDate, setReqDate] = useState({
+        start: "2025-01-01",
+        end: "2025-06-30",
+    });
+
+    // Filter data berdasarkan rentang tanggal (Logika yang lebih robust)
+    const getFilteredData = (range: { start: string, end: string }) => {
+        if (!range.start || !range.end) return MOCK_CHART_DATA;
+
+        // Parsing manual untuk menghindari isu timezone UTC vs Local
+        const parseDate = (dateStr: string) => {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        };
+
+        const startDate = parseDate(range.start);
+        const endDate = parseDate(range.end);
+        
+        return MOCK_CHART_DATA.filter((item) => {
+            const monthIdx = MONTHS_MAP[item.name] ?? 0;
+            // Mock data diasumsikan tahun 2025
+            const itemDate = new Date(2025, monthIdx, 1);
+            
+            // Cek apakah bulan item berada dalam rentang
+            // Kita bandingkan waktu (timestamp) untuk akurasi
+            return itemDate >= startDate && itemDate <= endDate;
+        });
+    };
+
+    const filteredRevData = getFilteredData(revDate);
+    const filteredReqData = getFilteredData(reqDate);
+
+    // Fungsi Export Pendapatan
+    const handleExportRev = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Bulan", key: "name" },
+            { label: "Pendapatan (IDR)", key: "pendapatan" },
+        ];
+        const filename = `Laporan_Pendapatan_${revDate.start}_${revDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredRevData, filename, headers);
+        } else {
+            exportToPDF(
+                filteredRevData, 
+                filename, 
+                "Laporan Pendapatan Kapal Riset", 
+                headers,
+                (key, val) => key === "pendapatan" ? `Rp ${Number(val).toLocaleString("id-ID")}` : val
+            );
+        }
+    };
+
+    // Fungsi Export Pengajuan
+    const handleExportReq = (type: "csv" | "pdf") => {
+        const headers = [
+            { label: "Bulan", key: "name" },
+            { label: "Jumlah Pengajuan", key: "pesanan" },
+        ];
+        const filename = `Laporan_Pengajuan_${reqDate.start}_${reqDate.end}`;
+        
+        if (type === "csv") {
+            exportToCSV(filteredReqData, filename, headers);
+        } else {
+            exportToPDF(
+                filteredReqData, 
+                filename, 
+                "Laporan Frekuensi Pengajuan Sewa", 
+                headers
+            );
+        }
+    };
+
     return (
         <ManagerLayout>
             <div className="space-y-6">
@@ -127,21 +213,17 @@ export default function Dashboard() {
                                         Total nominal penyewaan tahun 2025
                                     </p>
                                 </div>
-                                <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-                                    <div className="flex items-center gap-1.5 mr-2">
-                                        <input type="date" aria-label="Mulai Tanggal" className="h-8 rounded-lg border border-slate-border px-2 text-xs text-slate-muted focus:border-navy focus:outline-none" defaultValue="2025-01-01" />
-                                        <span className="text-xs text-slate-muted">-</span>
-                                        <input type="date" aria-label="Sampai Tanggal" className="h-8 rounded-lg border border-slate-border px-2 text-xs text-slate-muted focus:border-navy focus:outline-none" defaultValue="2025-06-30" />
-                                    </div>
-                                    <button className="flex items-center gap-1.5 rounded-lg border border-slate-border px-3 py-1.5 text-xs font-medium text-slate-muted hover:bg-soft-white hover:text-navy">
-                                        <FileDown size={14} />
-                                        Export
-                                    </button>
-                                </div>
+                                <ExportActions 
+                                    startDate={revDate.start}
+                                    endDate={revDate.end}
+                                    onDateChange={(start, end) => setRevDate({ start, end })}
+                                    onExportCSV={() => handleExportRev("csv")}
+                                    onExportPDF={() => handleExportRev("pdf")}
+                                />
                             </div>
                             <div className="p-6">
                                 <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={MOCK_CHART_DATA}>
+                                    <BarChart data={filteredRevData}>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
                                             vertical={false}
@@ -198,21 +280,17 @@ export default function Dashboard() {
                                         Total frekuensi pengajuan tahun 2025
                                     </p>
                                 </div>
-                                <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-                                    <div className="flex items-center gap-1.5 mr-2">
-                                        <input type="date" aria-label="Mulai Tanggal" className="h-8 rounded-lg border border-slate-border px-2 text-xs text-slate-muted focus:border-navy focus:outline-none" defaultValue="2025-01-01" />
-                                        <span className="text-xs text-slate-muted">-</span>
-                                        <input type="date" aria-label="Sampai Tanggal" className="h-8 rounded-lg border border-slate-border px-2 text-xs text-slate-muted focus:border-navy focus:outline-none" defaultValue="2025-06-30" />
-                                    </div>
-                                    <button className="flex items-center gap-1.5 rounded-lg border border-slate-border px-3 py-1.5 text-xs font-medium text-slate-muted hover:bg-soft-white hover:text-navy">
-                                        <FileDown size={14} />
-                                        Export
-                                    </button>
-                                </div>
+                                <ExportActions 
+                                    startDate={reqDate.start}
+                                    endDate={reqDate.end}
+                                    onDateChange={(start, end) => setReqDate({ start, end })}
+                                    onExportCSV={() => handleExportReq("csv")}
+                                    onExportPDF={() => handleExportReq("pdf")}
+                                />
                             </div>
                             <div className="p-6">
                                 <ResponsiveContainer width="100%" height={300}>
-                                    <LineChart data={MOCK_CHART_DATA}>
+                                    <LineChart data={filteredReqData}>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
                                             vertical={false}
