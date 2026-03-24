@@ -88,7 +88,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* ── Dashboard Semantic Colors ──
+  /* --- Dashboard Semantic Colors ---
      Warna yang dipakai berulang di sidebar, cards, dan top-bar
      didefinisikan sekali di sini agar mudah diganti secara global. */
   --color-navy: #1B263B;
@@ -109,5 +109,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* --- Chart Overrides ---
+     Menghilangkan outline fokus default dari container Recharts (svg)
+     agar UI tetap bersih saat grafik diklik. */
+  .recharts-wrapper:focus,
+  .recharts-surface:focus,
+  .recharts-responsive-container:focus {
+    outline: none !important;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }
