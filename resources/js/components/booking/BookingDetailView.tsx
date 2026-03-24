@@ -225,17 +225,56 @@ export function BookingDetailView({
     );
 }
 
-/** HELPER: Skeleton */
+import { Skeleton, CardSkeleton } from '../ui/Skeleton';
+
+/** HELPER: Skeleton Loading State */
 function DetailSkeleton() {
     return (
-        <div className="animate-pulse space-y-8">
-            <div className="h-10 w-64 bg-slate-100 rounded-xl" />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                   <div className="h-48 bg-slate-50 rounded-xl border border-slate-border/50" />
-                   <div className="h-80 bg-slate-50 rounded-xl border border-slate-border/50" />
+        <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto">
+            {/* Header Skeleton */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between py-2">
+                <div className="space-y-3">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-8 w-64" />
                 </div>
-                <div className="h-96 bg-slate-50 rounded-xl border border-slate-border/50" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-10 w-24 rounded-lg" />
+                    <Skeleton className="h-10 w-24 rounded-lg" />
+                </div>
+            </div>
+
+            {/* Banner Skeleton */}
+            <Skeleton className="h-28 w-full rounded-2xl" />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                {/* Main Content Side */}
+                <div className="lg:col-span-2 space-y-6">
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <div className="rounded-xl border border-slate-border/50 bg-white p-6 space-y-6">
+                        <Skeleton className="h-6 w-1/4" />
+                        <div className="grid grid-cols-2 gap-4">
+                            <Skeleton className="h-32 rounded-lg" />
+                            <Skeleton className="h-32 rounded-lg" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sidebar Side */}
+                <div className="space-y-6">
+                    <div className="rounded-xl border border-slate-border/50 bg-white p-6 space-y-6 h-[400px]">
+                        <Skeleton className="h-6 w-1/2" />
+                        <div className="space-y-4">
+                            <Skeleton className="h-12 w-full rounded-xl" />
+                            <Skeleton className="h-24 w-full rounded-xl" />
+                            <Skeleton className="h-12 w-full rounded-xl" />
+                        </div>
+                        <div className="pt-10 space-y-3">
+                             <Skeleton className="h-10 w-full rounded-lg" />
+                             <Skeleton className="h-10 w-full rounded-lg opacity-50" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

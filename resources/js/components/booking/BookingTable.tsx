@@ -1,7 +1,7 @@
 /**
  * BOOKING TABLE 
  * - Kolom standar (kode, peminjam, kegiatan, tanggal, harga, status, aksi)
- * - Extra columns opsional (untuk admin: tipe internal/eksternal, nama layanan)
+ * - Extra columns opsional (untuk admin dan lab: tipe internal/eksternal, nama layanan)
  * - Sorting per kolom
  * - Navigasi ke detail via prop `detailBaseUrl`
  * - Quick actions (approve, reject, edit harga)

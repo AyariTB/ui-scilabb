@@ -17,15 +17,12 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {
     Search,
-    Download,
     ChevronLeft,
     ChevronRight,
     Ship,
-    FileText,
-    FileSpreadsheet,
-    ChevronDown,
     X,
 } from 'lucide-react';
+import { ExportActions } from '../ui/ExportActions';
 
 // Shared booking components
 import { NegotiatePriceModal, ApproveBookingModal, RejectBookingModal } from './modals';
@@ -147,7 +144,6 @@ export function BookingListView({
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
-    const [showExportDropdown, setShowExportDropdown] = useState(false);
 
     // --- Derived: filtered + sorted data ---
     const processedBookings = useMemo(() => {
@@ -352,31 +348,8 @@ export function BookingListView({
                         </div>
                         <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
                     </div>
-
                     <div className="flex items-center gap-3">
                         {headerActions}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowExportDropdown(!showExportDropdown)}
-                                className="inline-flex items-center gap-2 rounded-lg border border-slate-border bg-white px-4 py-2 text-sm font-semibold text-navy transition-all hover:bg-soft-white"
-                            >
-                            <Download size={15} /> Export Data <ChevronDown size={14} className={`transition-transform duration-200 ${showExportDropdown ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        {showExportDropdown && (
-                            <>
-                                <div className="fixed inset-0 z-10" onClick={() => setShowExportDropdown(false)} />
-                                <div className="absolute right-0 mt-2 z-20 w-48 origin-top-right rounded-xl border border-slate-border bg-white p-1 shadow-xl animate-in zoom-in-95 duration-100">
-                                    <button onClick={() => { handleExportCSV(); setShowExportDropdown(false); }} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium text-navy hover:bg-soft-white transition-colors">
-                                        <FileSpreadsheet size={16} className="text-emerald-600" /> Export as CSV
-                                    </button>
-                                    <button onClick={() => { handleExportPDF(); setShowExportDropdown(false); }} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium text-navy hover:bg-soft-white transition-colors">
-                                        <FileText size={16} className="text-red-600" /> Export as PDF
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                        </div>
                     </div>
                 </div>
 
@@ -406,11 +379,16 @@ export function BookingListView({
 
                     {extraFilters}
 
-                    <div className="flex items-center gap-2">
-                        <input type="date" value={filters.date_from} onChange={(e) => handleFilterChange('date_from', e.target.value)} className="rounded-lg border border-slate-border bg-white py-2 px-3 text-sm text-navy focus:outline-none focus:ring-1 focus:ring-navy" />
-                        <span className="text-xs text-slate-muted font-medium">s/d</span>
-                        <input type="date" value={filters.date_to} onChange={(e) => handleFilterChange('date_to', e.target.value)} className="rounded-lg border border-slate-border bg-white py-2 px-3 text-sm text-navy focus:outline-none focus:ring-1 focus:ring-navy" />
-                    </div>
+                    <ExportActions 
+                        startDate={filters.date_from}
+                        endDate={filters.date_to}
+                        onDateChange={(start, end) => {
+                            handleFilterChange('date_from', start);
+                            handleFilterChange('date_to', end);
+                        }}
+                        onExportCSV={handleExportCSV}
+                        onExportPDF={handleExportPDF}
+                    />
 
                     {hasActiveFilters && (
                         <button onClick={() => { setFilters({ search: '', status: 'SEMUA', date_from: '', date_to: '' }); setCurrentPage(1); }} className="text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-tight px-2">Reset</button>
@@ -505,11 +483,24 @@ export function BookingListView({
     );
 }
 
+import { Skeleton, TableRowSkeleton } from '../ui/Skeleton';
+
 /** HELPER: Skeleton Loading State */
 function TableSkeleton() {
     return (
-        <div className="animate-pulse p-6 space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-slate-50 border border-slate-border/50 rounded-xl" />)}
+        <div className="bg-white rounded-xl divide-y divide-slate-border/50">
+            <div className="px-6 py-4 bg-slate-50 border-b border-slate-border/50 flex items-center gap-4">
+                <Skeleton className="h-4 w-4" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-20 ml-auto" />
+            </div>
+            {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both" style={{ animationDelay: `${i * 50}ms` }}>
+                    <TableRowSkeleton />
+                </div>
+            ))}
         </div>
     );
 }

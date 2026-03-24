@@ -59,10 +59,10 @@ export function BookingHeader({
 
                         {/* Timestamp Info */}
                         <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 uppercase ml-1">
-                            <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-lg border border-slate-border/50">
+                            <div className="flex items-center gap-2">
                                 Dibuat <span className="text-navy font-bold">{formatDateTime(booking.created_at)}</span>
                             </div>
-                            <div className="flex items-center gap-2 bg-white/50 px-3 py-1.5 rounded-lg border border-slate-border/50">
+                            <div className="flex items-center gap-2">
                                 Update <span className="text-navy font-bold">{formatDateTime(booking.updated_at)}</span>
                             </div>
                         </div>
