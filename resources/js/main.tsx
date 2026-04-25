@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import queryClient from './lib/query-client';
 
@@ -22,6 +22,14 @@ import VesselGuides from './pages/manager/vessel/VesselGuides';
 import BookingList from './pages/manager/bookings/BookingList';
 import BookingDetail from './pages/manager/bookings/BookingDetail';
 
+// User Pages
+import Home from './pages/user/Home';
+import ServicesList from './pages/user/services/ServicesList';
+import ServiceDetail from './pages/user/services/ServiceDetail';
+import LabList from './pages/user/laboratories/LabList';
+import LabDetail from './pages/user/laboratories/LabDetail';
+import Profile from './pages/user/Profile';
+
 import './app.css';
 
 const container = document.getElementById('app');
@@ -33,8 +41,13 @@ if (container) {
             <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
                 <Routes>
-                    {/* Default redirect to Admin Dashboard */}
-                    <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                    {/* Public Routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/services" element={<ServicesList />} />
+                    <Route path="/services/:id" element={<ServiceDetail />} />
+                    <Route path="/laboratories" element={<LabList />} />
+                    <Route path="/laboratories/:id" element={<LabDetail />} />
+                    <Route path="/profile" element={<Profile />} />
                     
                     {/* Admin Routes */}
                     <Route path="/admin/dashboard" element={<AdminDashboard />} />

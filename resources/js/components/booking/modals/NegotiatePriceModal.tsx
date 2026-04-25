@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Loader2, CreditCard } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
-import { formatIDR } from '../utils';
 
 interface NegotiatePriceModalProps {
     isOpen: boolean;

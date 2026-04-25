@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import type { Booking } from '@/types/booking.types';
 import { formatIDR, formatDateRange, formatShortDate, hasApprovedConflict } from './utils';
-import { BOOKING_STATUS_CONFIG, PAYMENT_STATUS_CONFIG, BOOKING_TYPE_CONFIG } from './constants';
+import { BOOKING_STATUS_CONFIG, PAYMENT_STATUS_CONFIG } from './constants';
 
 export type SortField = 'booking_code' | 'created_at' | 'start_date' | 'total_price';
 export type SortDir = 'asc' | 'desc';
